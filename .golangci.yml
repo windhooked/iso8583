@@ -1,0 +1,6 @@
+linters:
+    enable-all: true
+    disable:
+        - gochecknoglobals
+issues:
+    exclude-use-default: false
