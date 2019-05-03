@@ -1,5 +1,7 @@
-// Package iso8583 implements encoding and decoding of message as defined in ISO 8583.
-// For detail about this standard, see https://en.wikipedia.org/wiki/ISO_8583.
+// Copyright (c) 2019 Hervé Gouchet. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.package encoding
+
 package iso8583
 
 import (

@@ -1,3 +1,7 @@
+// Copyright (c) 2019 Hervé Gouchet. All rights reserved.
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.package encoding
+
 package iso8583
 
 // Version represents the ISO 8583 version used.
