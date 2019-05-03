@@ -2,7 +2,7 @@
 // Use of this source code is governed by the MIT License
 // that can be found in the LICENSE file.package encoding
 
-// Package iso8583 implements encoding and decoding of message as defined in ISO 8583.
+// Package iso8583 implements encoding and decoding of message as defined in iso 8583.
 // For detail about this standard, see https://en.wikipedia.org/wiki/ISO_8583.
 package iso8583
 
@@ -29,7 +29,7 @@ var (
 // Fields represents all message's fields.
 type Fields map[uint8]*field.Data
 
-// Message represents an ISO 8583 message.
+// Message represents an iso 8583 message.
 type Message struct {
 	MTI    *MTI
 	Format encoding.Format
@@ -37,12 +37,12 @@ type Message struct {
 	Fields
 }
 
-// Marshal returns the ISO 8683 encoding of Message.
+// Marshal returns the iso 8683 encoding of Message.
 func Marshal(_ *Message) ([]byte, error) {
 	return nil, errors.New("not implemented")
 }
 
-// Unmarshal parses the ISO 8583-encoded data and stores the result in the Message pointed.
+// Unmarshal parses the iso 8583-encoded data and stores the result in the Message pointed.
 func Unmarshal(data []byte, m *Message) error {
 	// Parses the Header.
 	data, err := m.header(data)
@@ -92,7 +92,6 @@ func (m *Message) bitmap(src []byte) (dst []byte, err error) {
 			return nil, err
 		}
 		m.Fields = Fields{1: f1}
-		fmt.Printf("bitmap: %s\n", b)
 
 		return src[z:], nil
 	}

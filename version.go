@@ -4,7 +4,7 @@
 
 package iso8583
 
-// Version represents the ISO 8583 version used.
+// Version represents the iso 8583 version used.
 type Version uint8
 
 const (
