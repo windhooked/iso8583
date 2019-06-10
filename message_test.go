@@ -9,6 +9,8 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/rvflash/iso8583/field"
+
 	"github.com/rvflash/iso8583/encoding"
 
 	"github.com/matryer/is"
@@ -19,7 +21,9 @@ func TestUnmarshal(t *testing.T) {
 	var (
 		msg = []string{
 			"ascii_network_management_request",
-			//	"ascii_financial_transaction_request",
+			"ascii_headed_network_management_request",
+			"ascii_network_management_response",
+			//"ascii_financial_transaction_request",
 		}
 		are = is.New(t)
 	)
@@ -29,21 +33,26 @@ func TestUnmarshal(t *testing.T) {
 			src, err := message(name)
 			are.NoErr(err)
 			dst := new(iso8583.Message)
+			dst.Format, err = encoding.Parse(src.Format)
+			are.NoErr(err)
+			dst.Header = src.Header
 			err = iso8583.Unmarshal([]byte(src.Message), dst)
 			are.NoErr(err)
 			are.Equal(dst.MTI.String(), src.MTI)
 			are.Equal(dst.Format, encoding.ASCII)
-			are.True(!dst.Header)
-			are.Equal(len(dst.Fields), len(src.Fields))
+			are.Equal(dst.Header, src.Header)
+			are.Equal(len(dst.Data), len(src.Fields))
 
 			for k, v := range src.Fields {
-				are.Equal(dst.Fields[k].String(), v)
+				are.Equal(dst.Data[field.ID(k)].String(), v)
 			}
 		})
 	}
 }
 
 type iso struct {
+	Header  bool             `json:"header,omitempty"`
+	Format  string           `json:"encoding,omitempty"`
 	Message string           `json:"message"`
 	MTI     string           `json:"mti,omitempty"`
 	Fields  map[uint8]string `json:"fields,omitempty"`

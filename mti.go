@@ -6,6 +6,8 @@ package iso8583
 
 import (
 	"fmt"
+
+	"github.com/rvflash/iso8583/errors"
 )
 
 // NewMTI returns a new Message Type Identifier.
@@ -38,12 +40,12 @@ func NewMTI(digit ...uint8) *MTI {
 func ParseMTI(s string) (*MTI, error) {
 	switch len(s) {
 	case 3:
-		// deals with missing version (aka GPS style)
+		// deals with missing version.
 		return parse("0" + s)
 	case 4:
 		return parse(s)
 	default:
-		return nil, ErrMTI
+		return nil, errors.MTI
 	}
 }
 
@@ -81,7 +83,7 @@ func parse(s string) (*MTI, error) {
 	)
 	for i, r := range s {
 		if r < '0' || r > '9' {
-			return nil, ErrMTI
+			return nil, errors.MTI
 		}
 		d = uint8(r - '0')
 		switch i {
@@ -96,7 +98,7 @@ func parse(s string) (*MTI, error) {
 		}
 	}
 	if !m.Valid() {
-		return nil, ErrMTI
+		return nil, errors.MTI
 	}
 	return m, nil
 }

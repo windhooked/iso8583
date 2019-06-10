@@ -5,12 +5,8 @@
 package field
 
 import (
-	"errors"
 	"time"
 )
-
-// ErrData is returned if the data is invalid.
-var ErrData = errors.New("invalid data")
 
 // Format represents the type of data.
 type Format uint16
@@ -44,27 +40,34 @@ const (
 	LLLVar
 )
 
-// Elements is implemented by a Data.
-type Elements interface {
-	// Int64
+// Field is implemented by any Data Element.
+type Field interface {
+	// ID returns the position of the field.
+	ID() ID
+	// FixedSize returns the fixed length of the data.
+	FixedSize(raw []byte) (int, error)
+	// Int64 tries to returns the data value as an int64.
 	Int64() (int64, error)
 	// String
 	String() string
-	// Int64
+	// Time tries to returns the data value as a time.Time.
 	Time() (time.Time, error)
-	// Valid
+	// Valid returns in success if the value of the data is valid.
 	Valid() bool
 }
 
-// Field represents an ISO 8583 data field
-type Field struct {
-	Format Format
+// Element represents an ISO 8583 data field
+type Element struct {
 	Type   Type
+	Format Format
 	Size   int
 }
 
+// ID is the position of the field in the list of data elements.
+type ID uint8
+
 // List all the known fields.
-var n = map[uint8]Field{
+var n = map[ID]Element{
 	1:   {Format: Binary, Size: 64},                                   // Bitmap (128 if secondary or 192 if tertiary).
 	2:   {Format: Numeric, Size: 19, Type: LLVar},                     // Primary account number (PAN)
 	3:   {Format: Numeric, Size: 6},                                   // Processing code
@@ -107,19 +110,19 @@ var n = map[uint8]Field{
 	40:  {Format: Alpha | Numeric, Size: 3},                           // Service restriction code
 	41:  {Format: Alpha | Numeric | Special, Size: 8},                 // Card acceptor (CA) terminal identification
 	42:  {Format: Alpha | Numeric | Special, Size: 15},                // CA identification code
-	43:  {Format: Alpha | Numeric | Special, Size: 40},                // CA address: 1-23 +12: city +2: state +2: country
+	43:  {Format: Alpha | Numeric | Special, Size: 40},                // CA address: <23 +12:city +2:state +2:country
 	44:  {Format: Alpha | Numeric, Size: 25, Type: LLVar},             // Additional response data
 	45:  {Format: Alpha | Numeric, Size: 76, Type: LLVar},             // Track 1 data
 	46:  {Format: Alpha | Numeric, Size: 999, Type: LLLVar},           // Additional data - ISO
 	47:  {Format: Alpha | Numeric, Size: 999, Type: LLLVar},           // Additional data - national
 	48:  {Format: Alpha | Numeric, Size: 999, Type: LLLVar},           // Additional data - private
-	49:  {Format: Alpha, Size: 3},                                     // Currency code, transaction
+	49:  {Format: Alpha, Size: 3},                                     // Currency code, transaction ISO_4217
 	50:  {Format: Alpha, Size: 3},                                     // Currency code, settlement
 	51:  {Format: Alpha, Size: 3},                                     // Currency code, cardholder billing
 	52:  {Format: Binary, Size: 64},                                   //  data
 	53:  {Format: Numeric, Size: 16},                                  // Security related control information
 	54:  {Format: Alpha | Numeric, Size: 120, Type: LLLVar},           // Additional amounts
-	55:  {Format: Alpha | Numeric | Special, Size: 999, Type: LLLVar}, // ICC Elements - EMV having multiple tags
+	55:  {Format: Alpha | Numeric | Special, Size: 999, Type: LLLVar}, // ICC Field - EMV having multiple tags
 	56:  {Format: Alpha | Numeric | Special, Size: 999, Type: LLLVar}, // Reserved ISO
 	57:  {Format: Alpha | Numeric | Special, Size: 999, Type: LLLVar}, // Reserved national
 	58:  {Format: Alpha | Numeric | Special, Size: 999, Type: LLLVar}, // Reserved national

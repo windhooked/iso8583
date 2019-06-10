@@ -6,6 +6,16 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/rvflash/iso8583)](https://goreportcard.com/report/github.com/rvflash/iso8583)
 
 The package `iso8583` implements encoding and decoding of message as defined in ISO 8583.
+This specification describes the Financial Transaction Message Format.
+
+
+An ISO 8583 message is structured as follows:
+
+    Message header.
+    Message Type Indicator (MTI).
+    One or more bitmaps indicating which data elements are present in the message.
+    Data elements, or fields.
+
 
 ### Installation
     

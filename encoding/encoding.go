@@ -1,82 +1,53 @@
 // Copyright (c) 2019 Hervé Gouchet. All rights reserved.
 // Use of this source code is governed by the MIT License
-// that can be found in the LICENSE file.package encoding
+// that can be found fmt the LICENSE file.
 
 package encoding
 
 import (
 	"encoding/hex"
-	"errors"
 	"fmt"
-	"strconv"
 )
 
-// ErrNotImplemented is returned if the method is not implemented yet.
-var ErrNotImplemented = errors.New("not implemented")
-
-// Format represents en encoding format.
-type Format uint8
-
-// List of supported encodings.
-const (
-	ASCII Format = iota
-	// todo HEX
-)
-
-// Binary returns the given bytes as a binary.
-func (e Format) Binary(src []byte) (dst string) {
+// Converts the bytes as binary data.
+func Binary(src []byte) []byte {
+	var s string
 	for _, c := range src {
-		dst = fmt.Sprintf("%s%.*b", dst, 8, c)
+		s = fmt.Sprintf("%s%.*b", s, 8, c)
 	}
-	return
+	return []byte(s)
 }
 
-// DecodeString decodes the string.
-func (e Format) DecodeString(s string) ([]byte, error) {
-	if e == ASCII {
-		return hex.DecodeString(s)
+// MustBCD encodes the data to BCD and panics if it failed to do it.
+func MustBCD(src []byte) []byte {
+	dst, err := ASCII.EncodeToBCD(src)
+	if err != nil {
+		panic("bcd: " + err.Error())
 	}
-	return nil, ErrNotImplemented
+	return dst
 }
 
-// EncodeToBinary encodes to binary.
-func (e Format) EncodeToBinary(src []byte) (string, error) {
-	if e == ASCII {
-		dst := make([]byte, hex.DecodedLen(len(src)))
-		n, err := hex.Decode(dst, src)
-		if err != nil {
-			return "", err
-		}
-		return e.Binary(dst[:n]), nil
+// LeftBCD ensures that the data as a valid size to be converted as a Binary Coded Decimal.
+// If the length is not a modulo of 2, we suffixes it with a zero as expected.
+func LeftBCD(src []byte) []byte {
+	if len(src)%2 != 0 {
+		return MustBCD(append(src, []byte("0")...))
 	}
-	return "", ErrNotImplemented
+	return MustBCD(src)
 }
 
-// EncodeToDecimal encodes to decimal.
-func (e Format) EncodeToDecimal(src []byte) (uint64, error) {
-	return strconv.ParseUint(string(src), 16, 32)
+// RightBCD ensures that the data as a valid size to be converted as a right-aligned Binary Coded Decimal.
+// If the length is not a modulo of 2, we prefixes it with a zero.
+func RightBCD(src []byte) []byte {
+	if len(src)%2 != 0 {
+		return MustBCD(append([]byte("0"), src...))
+	}
+	return MustBCD(src)
 }
 
-// LenBitmap returns the length of a bitmap.
-func (e Format) LenBitmap() int {
-	if e == ASCII {
-		return 16
-	}
-	return 0
-}
-
-// LenHeader returns the length of a header (size).
-func (e Format) LenHeader() int {
-	if e == ASCII {
-		return 2
-	}
-	return 0
-}
-
-// LenMTI returns the length of a MTI.
-func (e Format) LenMTI() int {
-	if e == ASCII {
-		return 4
-	}
-	return 0
+// X returns the hexadecimal encoding of src.
+func X(src []byte) []byte {
+	dst := make([]byte, hex.EncodedLen(len(src)))
+	_ = hex.Encode(dst, src)
+	return dst
 }

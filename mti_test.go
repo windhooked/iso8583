@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/rvflash/iso8583/errors"
+
 	are "github.com/matryer/is"
 	"github.com/rvflash/iso8583"
 )
@@ -44,7 +46,7 @@ func TestParseMTI(t *testing.T) {
 		t.Run("#"+strconv.Itoa(i), func(t *testing.T) {
 			out, err := iso8583.ParseMTI(tt.in)
 			if tt.fail {
-				is.Equal(err, iso8583.ErrMTI)
+				is.Equal(err, errors.MTI)
 			} else {
 				is.NoErr(err)
 			}
